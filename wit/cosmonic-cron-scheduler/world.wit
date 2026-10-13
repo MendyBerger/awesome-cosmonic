@@ -1,0 +1,10 @@
+package cosmonic:cron-scheduler@0.1.0;
+
+/// A workload that schedules its own jobs and is called when they come due.
+@since(version = 0.1.0)
+world scheduler-client {
+    @since(version = 0.1.0)
+    import scheduler;
+    @since(version = 0.1.0)
+    export handler;
+}

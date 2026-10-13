@@ -53,6 +53,8 @@ jobs:
             dir: wit/cosmonic-kafka
           - package: notify
             dir: wit/cosmonic-notify
+          - package: cron-scheduler
+            dir: wit/cosmonic-cron-scheduler
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -100,7 +102,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [agent, kafka, notify]
+        package: [agent, kafka, notify, cron-scheduler]
     env:
       GITHUB_ACTOR: ${{ github.actor }}
       REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}

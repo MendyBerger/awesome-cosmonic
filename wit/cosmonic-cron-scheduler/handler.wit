@@ -1,0 +1,15 @@
+package cosmonic:cron-scheduler@0.1.0;
+
+/// Being called when a job comes due.
+///
+/// The workload holds no timer and doesn't need to run between firings.
+@since(version = 0.1.0)
+interface handler {
+    @since(version = 0.1.0)
+    use types.{firing, handle-error};
+
+    /// Called each time a job fires. Can be called more than once for the
+    /// same firing, so dedupe on `name` and `scheduled-at`.
+    @since(version = 0.1.0)
+    handle: async func(firing: firing) -> result<_, handle-error>;
+}

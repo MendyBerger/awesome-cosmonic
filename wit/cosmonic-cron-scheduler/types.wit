@@ -1,0 +1,152 @@
+package cosmonic:cron-scheduler@0.1.0;
+
+/// Types shared by `scheduler` and `handler`.
+///
+/// A schedule is structured rather than a crontab string, so an implementer
+/// can map it onto cron or a cloud scheduler without parsing.
+///
+/// # References
+///
+/// - [POSIX crontab](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/crontab.html)
+/// - [IANA Time Zone Database](https://www.iana.org/time-zones)
+@since(version = 0.1.0)
+interface types {
+    @since(version = 0.1.0)
+    use wasi:clocks/system-clock@0.3.0.{instant};
+
+    /// Inclusive, like 9-17 in cron. `start` must be <= `end`.
+    @since(version = 0.1.0)
+    record range {
+        start: u8,
+        end: u8,
+    }
+
+    /// Every `step`th value from `start` to `end`, like 9-17/2 in cron.
+    /// `start` must be <= `end`, and `step` must be > 0.
+    @since(version = 0.1.0)
+    record stepped {
+        start: u8,
+        end: u8,
+        step: u8,
+    }
+
+    /// One item of a cron field. Values must be in the field's range.
+    @since(version = 0.1.0)
+    variant part {
+        /// Every value, like * in cron.
+        any,
+        /// A single value, like 5 in cron.
+        at(u8),
+        /// Every value in the range, like 9-17 in cron.
+        range(range),
+        /// Every nth value from the field's minimum, like */15 in cron. Must be > 0.
+        every(u8),
+        /// Every nth value in the range, like 9-17/2 in cron.
+        stepped(stepped),
+    }
+
+    /// Matches the union of its parts, like commas in cron. Must not be empty.
+    @since(version = 0.1.0)
+    type selector = list<part>;
+
+    /// Days of the week. Flags rather than numbers, since cron and cloud
+    /// schedulers number them differently.
+    @since(version = 0.1.0)
+    flags weekdays {
+        sunday,
+        monday,
+        tuesday,
+        wednesday,
+        thursday,
+        friday,
+        saturday,
+    }
+
+    /// Months of the year.
+    @since(version = 0.1.0)
+    flags months {
+        january,
+        february,
+        march,
+        april,
+        may,
+        june,
+        july,
+        august,
+        september,
+        october,
+        november,
+        december,
+    }
+
+    /// Which days a schedule fires on. Day of month and day of week can't be
+    /// combined: cron ORs them and some cloud schedulers reject it.
+    @since(version = 0.1.0)
+    variant days {
+        /// Every day.
+        every-day,
+        /// 1-31. Months without that day are skipped.
+        of-month(selector),
+        /// Must not be empty.
+        of-week(weekdays),
+    }
+
+    /// Fires when every field matches the current time, in `timezone`.
+    /// Minute resolution.
+    @since(version = 0.1.0)
+    record schedule {
+        /// 0-59
+        minutes: selector,
+        /// 0-23
+        hours: selector,
+        days: days,
+        /// None means every month. Must not be empty if set.
+        months: option<months>,
+        /// IANA name, e.g. "Europe/Amsterdam". None means UTC.
+        timezone: option<string>,
+    }
+
+    /// A job held for the caller's workload.
+    @since(version = 0.1.0)
+    record job {
+        /// Chosen by the caller, unique per workload.
+        name: string,
+        schedule: schedule,
+    }
+
+    /// One time a job came due, as passed to `handler`.
+    @since(version = 0.1.0)
+    record firing {
+        /// The job that came due.
+        name: string,
+        /// When the job was due, which is before the handler runs.
+        scheduled-at: instant,
+    }
+
+    /// Why a job couldn't be registered. The implementer's own failures
+    /// aren't returned; it retries or traps.
+    @since(version = 0.1.0)
+    variant register-error {
+        /// The schedule breaks a rule documented on its types, or names an
+        /// unknown time zone.
+        invalid-schedule(string),
+        /// The schedule is valid, but the implementer can't run it.
+        unsupported(string),
+        /// The caller may not schedule jobs.
+        access-denied,
+        /// Anything else. Detail is for logs only.
+        other(option<string>),
+    }
+
+    /// Why a firing wasn't handled.
+    @since(version = 0.1.0)
+    variant handle-error {
+        /// Deliver this firing again later. The caller may give up, or not
+        /// support retries at all.
+        retry(option<string>),
+        /// Don't deliver this firing again. The job keeps its schedule.
+        failed(option<string>),
+        /// Anything else, treated as `failed`. Detail is for logs only.
+        other(option<string>),
+    }
+}

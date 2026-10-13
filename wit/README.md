@@ -11,6 +11,7 @@ Long-lived operations use native WIT streams and futures.
 | [`cosmonic:agent`](cosmonic-agent/world.wit) 0.3.0 | An API for calling models, tools, and durable sessions without tying a component to one inference provider. |
 | [`cosmonic:kafka`](cosmonic-kafka/world.wit) 0.5.1 | An API for publishing, consuming, and handling Kafka records through host-owned, binding-scoped clients, with optional transactions. |
 | [`cosmonic:notify`](cosmonic-notify/notify.wit) 0.2.0 | An API for sending notifications to users and getting their responses, with actions such as links and callbacks. |
+| [`cosmonic:cron-scheduler`](cosmonic-cron-scheduler/world.wit) 0.1.0 | An API for a component to schedule its own jobs and be called when they come due, portable to cron and cloud schedulers. |
 
 ## Inference and agent worlds
 

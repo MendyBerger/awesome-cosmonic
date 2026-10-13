@@ -103,6 +103,7 @@ Interface packages published to GHCR, laid out as `ghcr.io/cosmonic-labs/cosmoni
 - [cosmonic:agent](wit/cosmonic-agent/): An API for calling models, tools, and durable sessions without tying a component to one inference provider.
 - [cosmonic:kafka](wit/cosmonic-kafka/): An API for publishing, consuming, and handling Kafka records through host-owned, binding-scoped clients, with optional transactions.
 - [cosmonic:notify](wit/cosmonic-notify/): An API for sending notifications to users and getting their responses, with actions such as links and callbacks.
+- [cosmonic:cron-scheduler](wit/cosmonic-cron-scheduler/): An API for a component to schedule its own jobs and be called when they come due, portable to cron and cloud schedulers.
 
 ## Host Plugins
 

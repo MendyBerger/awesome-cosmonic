@@ -1,0 +1,29 @@
+package cosmonic:cron-scheduler@0.1.0;
+
+/// The caller may schedule jobs for its own workload.
+///
+/// A firing always goes to the `handler` of the workload that registered the
+/// job; nothing here can name another workload. Jobs are held by name, not by
+/// a handle, because a component instance may only live for one call.
+@since(version = 0.1.0)
+interface scheduler {
+    @since(version = 0.1.0)
+    use types.{schedule, job, register-error};
+
+    /// Creates the job, or replaces it if one with this name exists.
+    /// Safe to call on every startup.
+    @since(version = 0.1.0)
+    register: async func(name: string, schedule: schedule) -> result<_, register-error>;
+
+    /// Removes the job. Does nothing if it doesn't exist.
+    @since(version = 0.1.0)
+    unregister: async func(name: string);
+
+    /// The job with this name, if there is one.
+    @since(version = 0.1.0)
+    get: async func(name: string) -> option<job>;
+
+    /// All jobs of the caller's workload.
+    @since(version = 0.1.0)
+    list-jobs: async func() -> list<job>;
+}
